@@ -13,11 +13,7 @@
 	<name>k9nlp-tokeniser</name>
 
 
-	<dependencies>
-		<dependency>
-			<groupId>org.apache.opennlp</groupId>
-			<artifactId>opennlp-tools</artifactId>
-		</dependency>
+	<dependencies>		
 
 		<dependency>
 			<groupId>edu.stanford.nlp</groupId>

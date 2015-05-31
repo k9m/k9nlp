@@ -21,12 +21,7 @@
 	<dependencyManagement>
 
 		<dependencies>
-
-			<dependency>
-				<groupId>org.apache.opennlp</groupId>
-				<artifactId>opennlp-tools</artifactId>
-				<version>1.5.3</version>
-			</dependency>
+			
 			<dependency>
 				<groupId>edu.stanford.nlp</groupId>
 				<artifactId>stanford-corenlp</artifactId>
@@ -125,9 +120,6 @@
 			<groupId>com.fasterxml.jackson.core</groupId>
 			<artifactId>jackson-databind</artifactId>
 		</dependency>
-
-
-
 
 		<dependency>
 			<groupId>junit</groupId>
