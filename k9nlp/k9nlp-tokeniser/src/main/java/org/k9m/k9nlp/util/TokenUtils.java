@@ -13,14 +13,15 @@ public class TokenUtils {
 		
 		return log.toString();
 	}
+	
+	public static boolean ifAnyOf(String[] matchedTokens, String partOfSpeechType){
+		for (String string : matchedTokens) {
+			if(string.equalsIgnoreCase(partOfSpeechType)){
+				return true;
+			}
+		}
+		
+		return false;
+	}
 
 }
-
-
-//List<CoreLabel> labels = document.get(TokensAnnotation.class);
-//for (CoreLabel coreLabel : labels) {
-//	for (Class clazz : document.keySet()) {
-//		LOG.info("LabelKeys: {}", clazz);
-//	}
-//	LOG.info("*****************************");
-//}

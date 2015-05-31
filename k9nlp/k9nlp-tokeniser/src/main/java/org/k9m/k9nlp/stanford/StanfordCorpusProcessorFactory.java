@@ -32,9 +32,11 @@ public class StanfordCorpusProcessorFactory {
 
 	public Annotation constructDocument(String corpusText){
 		LOG.info("Constructing document...");
+		
 		Annotation document = new Annotation(corpusText);		
 		pipeline.annotate(document);
-		LOG.info("Document Constructed...");
+		
+		LOG.info("Document Constructed");
 		
 		return document;
 	}

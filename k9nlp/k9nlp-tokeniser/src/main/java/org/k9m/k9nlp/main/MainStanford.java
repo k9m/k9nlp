@@ -2,17 +2,21 @@ package org.k9m.k9nlp.main;
 
 import java.io.FileNotFoundException;
 
+import org.k9m.k9nlp.model.CorpusProfile;
 import org.k9m.k9nlp.stanford.StanfordCorpusProcessor;
 import org.k9m.k9nlp.stanford.StanfordCorpusProcessorFactory;
 import org.k9m.k9nlp.util.TokenUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import com.fasterxml.jackson.core.JsonProcessingException;
+import com.fasterxml.jackson.databind.ObjectMapper;
+
 import edu.stanford.nlp.pipeline.Annotation;
 
 public class MainStanford {
 
-	public static void main(String[] args) throws FileNotFoundException {
+	public static void main(String[] args) throws FileNotFoundException, JsonProcessingException {
 
 		Logger LOG = LoggerFactory.getLogger(MainStanford.class);
 		
@@ -22,10 +26,12 @@ public class MainStanford {
 		StanfordCorpusProcessorFactory corpusProcessorFactory = StanfordCorpusProcessorFactory.getInstance();		
 		
 		Annotation document = corpusProcessorFactory.constructDocument(corpusText);
-		LOG.info("DocumentKeys: {}\n", TokenUtils.printKeys(document));
+		LOG.debug("DocumentKeys: {}\n", TokenUtils.printKeys(document));
 		
-		StanfordCorpusProcessor corpusProcessor = new StanfordCorpusProcessor(document);
-		corpusProcessor.processDocument();	
+		StanfordCorpusProcessor corpusProcessor = new StanfordCorpusProcessor("test_id", document);
+		CorpusProfile corpusProfile = corpusProcessor.processDocument();	
+		
+		LOG.info(new ObjectMapper().writeValueAsString(corpusProfile));
 
 
 	}
