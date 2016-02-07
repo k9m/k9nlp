@@ -19,6 +19,59 @@ Friendly Java API for extracting Named Entities from a body of text
 		LOG.info(new ObjectMapper().writeValueAsString(documentProfile));
 
 	}
+	
+	//Sample JSON output
+	{
+	"documentId": "test_id",
+	"keywords": [{
+		"word": "mins",
+		"lemma": "min",
+		"keywordType": "DURATION",
+		"pos": "NNS"
+	},	
+	{
+		"word": "classic",
+		"lemma": "classic",
+		"keywordType": "O",
+		"pos": "JJ"
+	},
+	{
+		"word": "leads",
+		"lemma": "lead",
+		"keywordType": "O",
+		"pos": "VBZ"
+	},	
+	{
+		"word": "Hard",
+		"lemma": "hard",
+		"keywordType": "O",
+		"pos": "JJ"
+	}],
+	"entities": [{
+		"entity": "Jerome L'Burgouis",
+		"entityType": "PERSON"
+	},	
+	{
+		"entity": "102 mins",
+		"entityType": "DURATION"
+	},
+	{
+		"entity": "1987",
+		"entityType": "DATE"
+	},
+	{
+		"entity": "80s",
+		"entityType": "NUMBER"
+	},
+	{
+		"entity": "John Woo",
+		"entityType": "PERSON"
+	},	
+	{
+		"entity": "New York City",
+		"entityType": "LOCATION"
+	}]	
+}
 
 ACKNOWLEDGEMENTS:
 Mining of entities is entirely driven by Stanford NLP engine.
