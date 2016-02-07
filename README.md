@@ -1,26 +1,22 @@
-Friendly Java API for extracting Named Entities from a body of text
+Friendly Java API for extracting Named Entities from a body of text using Stanford NLP NER.
 
-  public static void main(String[] args) throws Exception {
-
-		Logger LOG = LoggerFactory.getLogger(MainStanford.class);		
-
+	Sample Java code:
+	
+	public static void main(String[] args) throws Exception {	
 		//Input as raw text
 		String textBody = TokenUtils.readFileContent("sample.txt");	
 		
-		DocumentProcessorFactory documentProcessorFactory = DocumentProcessorFactory.getInstance();		
-		
-		Annotation document = documentProcessorFactory.constructDocument(textBody);
-		LOG.debug("DocumentKeys: {}\n", TokenUtils.printKeys(document));
+		Annotation document = DocumentProcessorFactory.getInstance().constructDocument(textBody);
 		
 		DocumentProcessor documentProcessor = new DocumentProcessor("test_id", document);
 		DocumentProfile documentProfile = documentProcessor.processDocument();	
 		
 		//Output as JSON
 		LOG.info(new ObjectMapper().writeValueAsString(documentProfile));
-
 	}
 	
-	//Sample JSON output
+	Sample JSON output:
+	
 	{
 	"documentId": "test_id",
 	"keywords": [{
@@ -29,12 +25,6 @@ Friendly Java API for extracting Named Entities from a body of text
 		"keywordType": "DURATION",
 		"pos": "NNS"
 	},	
-	{
-		"word": "classic",
-		"lemma": "classic",
-		"keywordType": "O",
-		"pos": "JJ"
-	},
 	{
 		"word": "leads",
 		"lemma": "lead",
