@@ -58,5 +58,16 @@ public class DocumentProcessorTest {
 		}
 		assertEquals("Keyword mismatch", TEST_KEYWORDS.length, keywords.size());
 	}
+	
+	//TODO implementing setting types at runtime
+//	@Test
+//	public void testSetkeywordType(){
+//		
+//	}
+//	
+//	@Test
+//	public void testSetEntityType(){
+//		
+//	}
 
 }

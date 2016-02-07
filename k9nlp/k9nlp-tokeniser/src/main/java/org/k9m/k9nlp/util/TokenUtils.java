@@ -2,7 +2,10 @@ package org.k9m.k9nlp.util;
 
 import java.io.BufferedReader;
 import java.io.InputStreamReader;
+import java.util.Arrays;
+import java.util.List;
 
+import org.k9m.k9nlp.model.KeywordType;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.core.io.ClassPathResource;
@@ -24,9 +27,13 @@ public class TokenUtils {
 		return log.toString();
 	}
 
-	public static boolean ifAnyOf(String[] matchedTokens, String partOfSpeechType){
-		for (String string : matchedTokens) {
-			if(string.equalsIgnoreCase(partOfSpeechType)){
+	public static boolean ifAnyOf(Enum[] matchedTokens, String partOfSpeechType){
+		return ifAnyOf(Arrays.asList(matchedTokens), partOfSpeechType);
+	}
+	
+	public static boolean ifAnyOf(List<? extends Enum> matchedTokens, String partOfSpeechType){
+		for (Enum enumName : matchedTokens) {
+			if(enumName.toString().equalsIgnoreCase(partOfSpeechType)){
 				return true;
 			}
 		}

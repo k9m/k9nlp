@@ -1,10 +1,14 @@
 package org.k9m.k9nlp.stanford;
 
+import static org.k9m.k9nlp.model.KeywordType.*;
+
+import java.util.Arrays;
 import java.util.List;
 
 import org.k9m.k9nlp.model.DocumentProfile;
 import org.k9m.k9nlp.model.Entity;
 import org.k9m.k9nlp.model.Keyword;
+import org.k9m.k9nlp.model.KeywordType;
 import org.k9m.k9nlp.util.TokenUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -25,14 +29,25 @@ public class DocumentProcessor {
 
 	private static Logger LOG = LoggerFactory.getLogger(DocumentProcessor.class);
 
-	private DocumentProfile documentProfile;
-	private Annotation document;
+	private final DocumentProfile documentProfile;
+	private final Annotation document;
 	
+	private List<KeywordType> parsedKeywordTypes = Arrays.asList(new KeywordType[]{FW,JJ,JJR,JJS,NN,NNS,VB,VBD,VBG,VBN,VBP,VBZ,UH});
 
-	public DocumentProcessor(String documentId, Annotation document) {
-		documentProfile = new DocumentProfile(documentId);
+	public DocumentProcessor(String documentId, Annotation document) {		
+		this.documentProfile = new DocumentProfile(documentId);
 		this.document = document;
 	}
+	
+	//TODO writing up tests
+//	public DocumentProcessor setParsedKeywordTypes(List<KeywordType> parsedKeywordTypes) {
+//		this.parsedKeywordTypes = parsedKeywordTypes;
+//		return this;
+//	}
+//	
+//	public List<KeywordType> getParsedKeywordTypes() {
+//		return parsedKeywordTypes;
+//	}
 
 	public DocumentProfile processDocument(){		
 		List<CoreMap> sentences = document.get(SentencesAnnotation.class);
@@ -40,14 +55,14 @@ public class DocumentProcessor {
 		if(sentences.size() > 0){ LOG.debug("SentenceKeys: {}\n", TokenUtils.printKeys(sentences.get(0))); }		
 		int index = 0;
 		for(CoreMap sentence : sentences) {
-			List<CoreMap> mentions = sentence.get(MentionsAnnotation.class);
+			List<CoreMap> mentions = sentence.get(MentionsAnnotation.class);			
 			
-			//Printing Keys
 			if(index++ == 0){
 				if(sentence != null && sentence.size() > 0){ LOG.debug("TokenKeys: {}\n", TokenUtils.printKeys(sentence)); }
 				if(mentions != null && mentions.size() > 0){ LOG.debug("MentionsKeys: {}\n", TokenUtils.printKeys(mentions.get(0))); }
 			}
 			
+			LOG.debug("Sentence:  {}", sentence.get(TextAnnotation.class));
 			if(mentions != null && mentions.size() > 0){
 				this.processMentions(mentions);
 			}
@@ -74,15 +89,14 @@ public class DocumentProcessor {
 		return documentProfile;
 	}
 
-	private void processSentence(CoreMap sentence){				
-		LOG.debug("Sentence:  {},\n", sentence.get(TextAnnotation.class));		
+	private void processSentence(CoreMap sentence){
 		for (CoreLabel token : sentence.get(TokensAnnotation.class)) {
 
 			String word = token.get(OriginalTextAnnotation.class);			
 			String pos = token.get(PartOfSpeechAnnotation.class);
 			String ne = token.get(NamedEntityTagAnnotation.class);			
 
-			if(TokenUtils.ifAnyOf(new String[]{"FW","JJ","JJR","JJS","NN","NNS","VB","VBD","VBG","VBN","VBP","VBZ","UH"}, pos)){				
+			if(TokenUtils.ifAnyOf(parsedKeywordTypes, pos)){				
 				String lemma = token.lemma();
 				
 				Keyword keyword = new Keyword();
@@ -97,7 +111,7 @@ public class DocumentProcessor {
 				LOG.debug("NE:     {}",ne);			
 				LOG.debug("Lemma:  {}",lemma);
 
-				LOG.debug("===========================");
+				LOG.debug("===========================\n");
 				
 				documentProfile.addKeyword(keyword);
 			}
@@ -117,44 +131,5 @@ public class DocumentProcessor {
 			documentProfile.addEntity(new Entity(entity, ne));
 		}
 	}
-	
-
-	/*	
-	CC 	coordinating conjunction 	and
-	CD 	cardinal number 	1, third
-	DT 	determiner 	the
-	EX 	existential there 	there is
-	FW 	foreign word 	d’hoevre
-	IN 	preposition/subordinating conjunction 	in, of, like
-	JJ 	adjective 	big
-	JJR 	adjective, comparative 	bigger
-	JJS 	adjective, superlative 	biggest
-	LS 	list marker 	1)
-	MD 	modal 	could, will
-	NN 	noun, singular or mass 	door
-	NNS 	noun plural 	doors
-	NNP 	proper noun, singular 	John
-	NNPS 	proper noun, plural 	Vikings
-	PDT 	predeterminer 	both the boys
-	POS 	possessive ending 	friend‘s
-	PRP 	personal pronoun 	I, he, it
-	PRP$ 	possessive pronoun 	my, his
-	RB 	adverb 	however, usually, naturally, here, good
-	RBR 	adverb, comparative 	better
-	RBS 	adverb, superlative 	best
-	RP 	particle 	give up
-	TO 	to 	to go, to him
-	UH 	interjection 	uhhuhhuhh
-	VB 	verb, base form 	take
-	VBD 	verb, past tense 	took
-	VBG 	verb, gerund/present participle 	taking
-	VBN 	verb, past participle 	taken
-	VBP 	verb, sing. present, non-3d 	take
-	VBZ 	verb, 3rd person sing. present 	takes
-	WDT 	wh-determiner 	which
-	WP 	wh-pronoun 	who, what
-	WP$ 	possessive wh-pronoun 	whose
-	WRB 	wh-abverb 	where, when
-	*/
 	
 }
