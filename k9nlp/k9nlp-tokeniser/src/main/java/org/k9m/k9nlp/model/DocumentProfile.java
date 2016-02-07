@@ -5,9 +5,9 @@ import java.util.Set;
 
 public class DocumentProfile {
 	
-	private Set<String> keywords;
+	private Set<Keyword> keywords;
 	
-	private Set<String> entities;
+	private Set<Entity> entities;
 	
 	private final String documentId;
 		
@@ -23,20 +23,20 @@ public class DocumentProfile {
 		return documentId;
 	}
 
-	public Set<String> getKeywords() {
+	public Set<Keyword> getKeywords() {
 		return keywords;
 	}
 	
-	public Set<String> getEntities() {
+	public Set<Entity> getEntities() {
 		return entities;
 	}
 	
 	
-	public void addKeyword(String keyword) {
+	public void addKeyword(Keyword keyword) {
 		keywords.add(keyword);
 	}
 	
-	public void addEntity(String entity) {
+	public void addEntity(Entity entity) {
 		entities.add(entity);
 	}
 	

@@ -3,6 +3,8 @@ package org.k9m.k9nlp.stanford;
 import java.util.List;
 
 import org.k9m.k9nlp.model.DocumentProfile;
+import org.k9m.k9nlp.model.Entity;
+import org.k9m.k9nlp.model.Keyword;
 import org.k9m.k9nlp.util.TokenUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -80,10 +82,15 @@ public class DocumentProcessor {
 			String pos = token.get(PartOfSpeechAnnotation.class);
 			String ne = token.get(NamedEntityTagAnnotation.class);			
 
-			if(TokenUtils.ifAnyOf(new String[]{"FW","JJ","JJR","JJS","NN","NNS","VB","VBD","VBG","VBN","VBP","VBZ","UH"}, pos)){
-				
+			if(TokenUtils.ifAnyOf(new String[]{"FW","JJ","JJR","JJS","NN","NNS","VB","VBD","VBG","VBN","VBP","VBZ","UH"}, pos)){				
 				String lemma = token.lemma();
-				documentProfile.addKeyword(lemma);
+				
+				Keyword keyword = new Keyword();
+				
+				keyword.setKeywordType(ne);
+				keyword.setPos(pos);
+				keyword.setWord(word);
+				keyword.setLemma(lemma);
 				
 				LOG.debug("Word:   {}",word);
 				LOG.debug("POS:    {}",pos);
@@ -91,6 +98,8 @@ public class DocumentProcessor {
 				LOG.debug("Lemma:  {}",lemma);
 
 				LOG.debug("===========================");
+				
+				documentProfile.addKeyword(keyword);
 			}
 		
 		}
@@ -100,12 +109,12 @@ public class DocumentProcessor {
 		for (CoreMap mention : mentions) {			
 			String entity = mention.get(TextAnnotation.class);
 			String ne = mention.get(NamedEntityTagAnnotation.class);
-			
-			documentProfile.addEntity(entity);						
 
 			LOG.debug("Entity: {}",entity);			
 			LOG.debug("NE:     {}",ne);		
 			LOG.debug("----------------------------");
+			
+			documentProfile.addEntity(new Entity(entity, ne));
 		}
 	}
 	

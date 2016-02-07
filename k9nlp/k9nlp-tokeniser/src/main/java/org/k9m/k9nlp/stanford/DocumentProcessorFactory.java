@@ -25,7 +25,7 @@ public class DocumentProcessorFactory {
 		LOG.info("Pipeline initialised");
 	}
 	
-	public static DocumentProcessorFactory getInstance(){
+	public static synchronized DocumentProcessorFactory getInstance(){
 		return self;
 	}
 
