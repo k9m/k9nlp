@@ -3,7 +3,7 @@ package org.k9m.k9nlp.model;
 import java.util.HashSet;
 import java.util.Set;
 
-public class CorpusProfile {
+public class DocumentProfile {
 	
 	private final String corpusId;
 	
@@ -12,7 +12,7 @@ public class CorpusProfile {
 	private Set<String> entities;
 		
 
-	public CorpusProfile(String corpusId) {
+	public DocumentProfile(String corpusId) {
 		keywords = new HashSet<>();
 		entities = new HashSet<>();
 		this.corpusId = corpusId;

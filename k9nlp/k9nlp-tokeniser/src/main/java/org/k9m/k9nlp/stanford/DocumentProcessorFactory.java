@@ -9,14 +9,14 @@ import org.slf4j.LoggerFactory;
 import edu.stanford.nlp.pipeline.Annotation;
 import edu.stanford.nlp.pipeline.StanfordCoreNLP;
 
-public class StanfordCorpusProcessorFactory {
+public class DocumentProcessorFactory {
 	
-	private static final Logger LOG = LoggerFactory.getLogger(MainStanford.class);
+	private static final Logger LOG = LoggerFactory.getLogger(DocumentProcessorFactory.class);
 
 	private final StanfordCoreNLP pipeline;	
-	private static StanfordCorpusProcessorFactory self = new StanfordCorpusProcessorFactory();
+	private static DocumentProcessorFactory self = new DocumentProcessorFactory();
 
-	private StanfordCorpusProcessorFactory(){
+	private DocumentProcessorFactory(){
 		LOG.info("Initiliasing pipeline..."); 
 		
 		Properties props = new Properties();
@@ -26,7 +26,7 @@ public class StanfordCorpusProcessorFactory {
 		LOG.info("Pipeline initialised");
 	}
 	
-	public static StanfordCorpusProcessorFactory getInstance(){
+	public static DocumentProcessorFactory getInstance(){
 		return self;
 	}
 

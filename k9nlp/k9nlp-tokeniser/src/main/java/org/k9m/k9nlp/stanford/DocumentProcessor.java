@@ -2,7 +2,7 @@ package org.k9m.k9nlp.stanford;
 
 import java.util.List;
 
-import org.k9m.k9nlp.model.CorpusProfile;
+import org.k9m.k9nlp.model.DocumentProfile;
 import org.k9m.k9nlp.util.TokenUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -19,20 +19,20 @@ import edu.stanford.nlp.pipeline.Annotation;
 import edu.stanford.nlp.util.CoreMap;
 
 
-public class StanfordCorpusProcessor {
+public class DocumentProcessor {
 
-	private static Logger LOG = LoggerFactory.getLogger(StanfordCorpusProcessor.class);
+	private static Logger LOG = LoggerFactory.getLogger(DocumentProcessor.class);
 
-	private CorpusProfile corpusProfile;
+	private DocumentProfile corpusProfile;
 	private Annotation document;
 	
 
-	public StanfordCorpusProcessor(String corpusId, Annotation document) {
-		corpusProfile = new CorpusProfile(corpusId);
+	public DocumentProcessor(String corpusId, Annotation document) {
+		corpusProfile = new DocumentProfile(corpusId);
 		this.document = document;
 	}
 
-	public CorpusProfile processDocument(){		
+	public DocumentProfile processDocument(){		
 		List<CoreMap> sentences = document.get(SentencesAnnotation.class);
 
 		if(sentences.size() > 0){ LOG.debug("SentenceKeys: {}\n", TokenUtils.printKeys(sentences.get(0))); }		
