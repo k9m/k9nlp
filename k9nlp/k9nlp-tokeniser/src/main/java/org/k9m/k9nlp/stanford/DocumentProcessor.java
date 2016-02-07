@@ -23,12 +23,12 @@ public class DocumentProcessor {
 
 	private static Logger LOG = LoggerFactory.getLogger(DocumentProcessor.class);
 
-	private DocumentProfile corpusProfile;
+	private DocumentProfile documentProfile;
 	private Annotation document;
 	
 
-	public DocumentProcessor(String corpusId, Annotation document) {
-		corpusProfile = new DocumentProfile(corpusId);
+	public DocumentProcessor(String documentId, Annotation document) {
+		documentProfile = new DocumentProfile(documentId);
 		this.document = document;
 	}
 
@@ -69,7 +69,7 @@ public class DocumentProcessor {
 		// Both sentence and token offsets start at 1!
 		//Map<Integer, CorefChain> graph = document.get(CorefChainAnnotation.class);
 
-		return corpusProfile;
+		return documentProfile;
 	}
 
 	private void processSentence(CoreMap sentence){				
@@ -83,7 +83,7 @@ public class DocumentProcessor {
 			if(TokenUtils.ifAnyOf(new String[]{"FW","JJ","JJR","JJS","NN","NNS","VB","VBD","VBG","VBN","VBP","VBZ","UH"}, pos)){
 				
 				String lemma = token.lemma();
-				corpusProfile.addKeyword(lemma);
+				documentProfile.addKeyword(lemma);
 				
 				LOG.debug("Word:   {}",word);
 				LOG.debug("POS:    {}",pos);
@@ -101,7 +101,7 @@ public class DocumentProcessor {
 			String entity = mention.get(TextAnnotation.class);
 			String ne = mention.get(NamedEntityTagAnnotation.class);
 			
-			corpusProfile.addEntity(entity);						
+			documentProfile.addEntity(entity);						
 
 			LOG.debug("Entity: {}",entity);			
 			LOG.debug("NE:     {}",ne);		

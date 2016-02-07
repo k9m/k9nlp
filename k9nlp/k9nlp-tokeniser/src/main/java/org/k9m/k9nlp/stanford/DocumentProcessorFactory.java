@@ -2,7 +2,6 @@ package org.k9m.k9nlp.stanford;
 
 import java.util.Properties;
 
-import org.k9m.k9nlp.main.MainStanford;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 

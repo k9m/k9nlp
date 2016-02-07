@@ -5,22 +5,22 @@ import java.util.Set;
 
 public class DocumentProfile {
 	
-	private final String corpusId;
-	
 	private Set<String> keywords;
 	
 	private Set<String> entities;
+	
+	private final String documentId;
 		
 
-	public DocumentProfile(String corpusId) {
-		keywords = new HashSet<>();
-		entities = new HashSet<>();
-		this.corpusId = corpusId;
+	public DocumentProfile(String documentId) {
+		this.keywords = new HashSet<>();
+		this.entities = new HashSet<>();
+		this.documentId = documentId;
 	}
 	
 
-	public String getCorpusId() {
-		return corpusId;
+	public String getDocumentId() {
+		return documentId;
 	}
 
 	public Set<String> getKeywords() {

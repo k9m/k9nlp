@@ -18,21 +18,19 @@ public class MainStanford {
 
 	public static void main(String[] args) throws FileNotFoundException, JsonProcessingException {
 
-		Logger LOG = LoggerFactory.getLogger(MainStanford.class);
+		Logger LOG = LoggerFactory.getLogger(MainStanford.class);		
+
+		String textBody = TokenUtils.readFileContent("sample.txt");	
 		
-		// read some text in the text variable
-		String corpusText = "Arnold Schwarzenegger and Jerome L'Burgouis leads Mara's platoon of Vikings into New York City carnage against an unseen alien beast along with John Woo's superslick action extravaganza. 80s classic from the director of Die Hard. Contains violence. (1987)(102 mins) Also in HD";	
+		DocumentProcessorFactory documentProcessorFactory = DocumentProcessorFactory.getInstance();		
 		
-		DocumentProcessorFactory corpusProcessorFactory = DocumentProcessorFactory.getInstance();		
-		
-		Annotation document = corpusProcessorFactory.constructDocument(corpusText);
+		Annotation document = documentProcessorFactory.constructDocument(textBody);
 		LOG.debug("DocumentKeys: {}\n", TokenUtils.printKeys(document));
 		
-		DocumentProcessor corpusProcessor = new DocumentProcessor("test_id", document);
-		DocumentProfile corpusProfile = corpusProcessor.processDocument();	
+		DocumentProcessor documentProcessor = new DocumentProcessor("test_id", document);
+		DocumentProfile documentProfile = documentProcessor.processDocument();	
 		
-		LOG.info(new ObjectMapper().writeValueAsString(corpusProfile));
-
+		LOG.info(new ObjectMapper().writeValueAsString(documentProfile));
 
 	}
 
