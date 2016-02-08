@@ -36,7 +36,12 @@ import edu.stanford.nlp.ling.CoreAnnotations.SentencesAnnotation;
 import edu.stanford.nlp.ling.CoreAnnotations.TextAnnotation;
 import edu.stanford.nlp.ling.CoreAnnotations.TokensAnnotation;
 import edu.stanford.nlp.ling.CoreLabel;
+import edu.stanford.nlp.ling.IndexedWord;
 import edu.stanford.nlp.pipeline.Annotation;
+import edu.stanford.nlp.semgraph.SemanticGraph;
+import edu.stanford.nlp.semgraph.SemanticGraphCoreAnnotations.BasicDependenciesAnnotation;
+import edu.stanford.nlp.trees.Tree;
+import edu.stanford.nlp.trees.TreeCoreAnnotations.TreeAnnotation;
 import edu.stanford.nlp.util.CoreMap;
 
 
@@ -53,16 +58,6 @@ public class DocumentProcessor {
 		this.documentProfile = new DocumentProfile(documentId);
 		this.document = document;
 	}
-	
-	//TODO writing up tests
-//	public DocumentProcessor setParsedKeywordTypes(List<KeywordType> parsedKeywordTypes) {
-//		this.parsedKeywordTypes = parsedKeywordTypes;
-//		return this;
-//	}
-//	
-//	public List<KeywordType> getParsedKeywordTypes() {
-//		return parsedKeywordTypes;
-//	}
 
 	public DocumentProfile processDocument(){		
 		List<CoreMap> stanfordSentences = document.get(SentencesAnnotation.class);
@@ -70,7 +65,7 @@ public class DocumentProcessor {
 		if(stanfordSentences.size() > 0){ LOG.debug("SentenceKeys: {}\n", TokenUtils.printKeys(stanfordSentences.get(0))); }		
 		int index = 0;
 		for(CoreMap stanfordSentence : stanfordSentences) {			
-			final List<CoreMap> mentions = stanfordSentence.get(MentionsAnnotation.class);
+			final List<CoreMap> mentions = stanfordSentence.get(MentionsAnnotation.class);			
 			
 			if(index++ == 0){
 				if(stanfordSentence != null && stanfordSentence.size() > 0){ LOG.debug("TokenKeys: {}\n", TokenUtils.printKeys(stanfordSentence)); }
@@ -92,6 +87,13 @@ public class DocumentProcessor {
 			}
 			
 			documentProfile.addSentence(sentence);
+			
+			final SemanticGraph semanticGraph = stanfordSentence.get(BasicDependenciesAnnotation.class);
+			processSemanticGraph(semanticGraph);
+			
+			final Tree tree = stanfordSentence.get(TreeAnnotation.class);
+			processParseTree(tree);			
+			
 
 			// this is the parse tree of the current sentence
 			//Tree tree = sentence.get(TreeAnnotation.class);
@@ -109,6 +111,14 @@ public class DocumentProcessor {
 		//Map<Integer, CorefChain> graph = document.get(CorefChainAnnotation.class);
 
 		return documentProfile;
+	}		
+	
+	private void processSemanticGraph(final SemanticGraph semanticGraph){
+		semanticGraph.prettyPrint();		
+	}
+	
+	private void processParseTree(final Tree tree){
+		tree.pennPrint();		
 	}
 
 	private Sentence processSentence(CoreMap stanfordSentence, Sentence sentence){

@@ -19,7 +19,7 @@ public class DocumentProcessorFactory {
 		LOG.info("Initiliasing pipeline..."); 
 		
 		Properties props = new Properties();
-		props.setProperty("annotators", "tokenize, ssplit, pos, lemma, ner, entitymentions");
+		props.setProperty("annotators", "tokenize, ssplit, pos, lemma, ner, parse, relation, entitymentions");
 		pipeline = new StanfordCoreNLP(props);	
 		
 		LOG.info("Pipeline initialised");
