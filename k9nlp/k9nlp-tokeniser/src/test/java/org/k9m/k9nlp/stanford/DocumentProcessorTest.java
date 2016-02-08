@@ -4,7 +4,7 @@ import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertTrue;
 
 import java.util.Arrays;
-import java.util.Set;
+import java.util.List;
 
 import org.junit.BeforeClass;
 import org.junit.Test;
@@ -49,7 +49,7 @@ public class DocumentProcessorTest {
 	public void testEntities(){
 		int totalEntities = 0;
 		for(Sentence sentence : documentProfile.getSentences()){
-			Set<Entity> entities = sentence.getEntities();
+			List<Entity> entities = sentence.getEntities();
 			for (Entity entity : entities) {
 				final String entityValue = entity.getEntity();
 				boolean isInEntities = Arrays.binarySearch(TEST_ENTITIES, entityValue) > -1;			
@@ -65,7 +65,7 @@ public class DocumentProcessorTest {
 	public void testKeywords(){		
 		int totalKeywords = 0;
 		for(Sentence sentence : documentProfile.getSentences()){		
-			Set<Keyword> keywords = sentence.getKeywords();
+			List<Keyword> keywords = sentence.getKeywords();
 			for (Keyword entity : keywords) {
 				final String entityValue = entity.getLemma();
 				boolean isInEntities = Arrays.binarySearch(TEST_KEYWORDS, entityValue) > -1;			

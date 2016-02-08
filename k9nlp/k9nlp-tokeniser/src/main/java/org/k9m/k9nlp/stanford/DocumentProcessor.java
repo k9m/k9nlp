@@ -36,7 +36,6 @@ import edu.stanford.nlp.ling.CoreAnnotations.SentencesAnnotation;
 import edu.stanford.nlp.ling.CoreAnnotations.TextAnnotation;
 import edu.stanford.nlp.ling.CoreAnnotations.TokensAnnotation;
 import edu.stanford.nlp.ling.CoreLabel;
-import edu.stanford.nlp.ling.IndexedWord;
 import edu.stanford.nlp.pipeline.Annotation;
 import edu.stanford.nlp.semgraph.SemanticGraph;
 import edu.stanford.nlp.semgraph.SemanticGraphCoreAnnotations.BasicDependenciesAnnotation;
@@ -64,7 +63,7 @@ public class DocumentProcessor {
 
 		if(stanfordSentences.size() > 0){ LOG.debug("SentenceKeys: {}\n", TokenUtils.printKeys(stanfordSentences.get(0))); }		
 		int index = 0;
-		for(CoreMap stanfordSentence : stanfordSentences) {			
+		for(final CoreMap stanfordSentence : stanfordSentences) {			
 			final List<CoreMap> mentions = stanfordSentence.get(MentionsAnnotation.class);			
 			
 			if(index++ == 0){
@@ -72,27 +71,13 @@ public class DocumentProcessor {
 				if(mentions != null && mentions.size() > 0){ LOG.debug("MentionsKeys: {}\n", TokenUtils.printKeys(mentions.get(0))); }
 			}
 			
-			final String sentenceText = stanfordSentence.get(TextAnnotation.class);
-			final Integer offsetStart = stanfordSentence.get(CharacterOffsetBeginAnnotation.class);
-			final Integer sentenceEndOffset = stanfordSentence.get(CharacterOffsetEndAnnotation.class);
-			LOG.debug("Sentence[{},{}]:  {}", new Object[]{offsetStart, sentenceEndOffset, sentenceText});
-			
-			Sentence sentence = new Sentence(sentenceText, offsetStart, sentenceEndOffset);
-			if(mentions != null && mentions.size() > 0){
-				sentence = this.processMentions(mentions, sentence);
-			}
-			
-			if(stanfordSentence != null && stanfordSentence.size() > 0){
-				sentence = this.processSentence(stanfordSentence, sentence);
-			}
-			
-			documentProfile.addSentence(sentence);
+			this.processDocumentProfile(stanfordSentence);
 			
 			final SemanticGraph semanticGraph = stanfordSentence.get(BasicDependenciesAnnotation.class);
-			processSemanticGraph(semanticGraph);
+			this.processSemanticGraph(semanticGraph);
 			
 			final Tree tree = stanfordSentence.get(TreeAnnotation.class);
-			processParseTree(tree);			
+			this.processParseTree(tree);			
 			
 
 			// this is the parse tree of the current sentence
@@ -114,14 +99,41 @@ public class DocumentProcessor {
 	}		
 	
 	private void processSemanticGraph(final SemanticGraph semanticGraph){
-		semanticGraph.prettyPrint();		
+		if(semanticGraph != null){
+			semanticGraph.prettyPrint();
+		}				
 	}
 	
 	private void processParseTree(final Tree tree){
-		tree.pennPrint();		
+		if(tree != null){
+			tree.pennPrint();		
+		}
+	}
+	
+	private void processDocumentProfile(CoreMap stanfordSentence){
+		final List<CoreMap> mentions = stanfordSentence.get(MentionsAnnotation.class);
+		if(stanfordSentence != null){
+			
+			final String sentenceText = stanfordSentence.get(TextAnnotation.class);
+			final Integer offsetStart = stanfordSentence.get(CharacterOffsetBeginAnnotation.class);
+			final Integer sentenceEndOffset = stanfordSentence.get(CharacterOffsetEndAnnotation.class);
+			Sentence sentence = new Sentence(sentenceText, offsetStart, sentenceEndOffset);
+			
+			LOG.debug("Sentence[{},{}]:  {}", new Object[]{offsetStart, sentenceEndOffset, sentenceText});
+						
+			if(mentions != null && mentions.size() > 0){
+				this.processMentions(mentions, sentence);
+			}
+			
+			if(stanfordSentence != null && stanfordSentence.size() > 0){
+				this.processSentence(stanfordSentence, sentence);
+			}
+			
+			documentProfile.addSentence(sentence);
+		}
 	}
 
-	private Sentence processSentence(CoreMap stanfordSentence, Sentence sentence){
+	private void processSentence(CoreMap stanfordSentence, Sentence sentence){
 		for (CoreLabel token : stanfordSentence.get(TokensAnnotation.class)) {
 
 			final String word = token.get(OriginalTextAnnotation.class);			
@@ -152,13 +164,13 @@ public class DocumentProcessor {
 				sentence.addKeyword(keyword);				
 			}
 		
-		}
+		}		
 		
-		return sentence;
 	}
 
-	private Sentence processMentions(List<CoreMap> mentions, Sentence sentence){		
-		for (CoreMap mention : mentions) {			
+	private void processMentions(List<CoreMap> mentions, Sentence sentence){		
+		for (CoreMap mention : mentions) {
+			
 			String entity = mention.get(TextAnnotation.class);
 			String ne = mention.get(NamedEntityTagAnnotation.class);
 
@@ -168,8 +180,6 @@ public class DocumentProcessor {
 			
 			sentence.addEntity(new Entity(entity, ne));
 		}
-		
-		return sentence;
 	}
 	
 }

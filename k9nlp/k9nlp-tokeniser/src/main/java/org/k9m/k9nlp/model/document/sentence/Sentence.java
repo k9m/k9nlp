@@ -1,6 +1,8 @@
 package org.k9m.k9nlp.model.document.sentence;
 
+import java.util.ArrayList;
 import java.util.HashSet;
+import java.util.List;
 import java.util.Set;
 
 import org.k9m.k9nlp.model.document.sentence.entity.Entity;
@@ -12,8 +14,8 @@ public class Sentence {
 	final Integer offsetStart;
 	final Integer offsetEnd;
 	
-	private Set<Keyword> keywords;	
-	private Set<Entity> entities;
+	private List<Keyword> keywords;	
+	private List<Entity> entities;
 	
 	
 	public Sentence(String sentence, Integer offsetStart, Integer offsetEnd) {
@@ -21,8 +23,8 @@ public class Sentence {
 		this.offsetStart = offsetStart;
 		this.offsetEnd = offsetEnd;
 		
-		this.keywords = new HashSet<>();
-		this.entities = new HashSet<>();
+		this.keywords = new ArrayList<>();
+		this.entities = new ArrayList<>();
 	}
 
 
@@ -38,11 +40,11 @@ public class Sentence {
 		return offsetEnd;
 	}
 	
-	public Set<Keyword> getKeywords() {
+	public List<Keyword> getKeywords() {
 		return keywords;
 	}
 	
-	public Set<Entity> getEntities() {
+	public List<Entity> getEntities() {
 		return entities;
 	}
 	
