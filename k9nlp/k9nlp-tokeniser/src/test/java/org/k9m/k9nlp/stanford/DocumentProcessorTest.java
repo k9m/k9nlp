@@ -8,9 +8,10 @@ import java.util.Set;
 
 import org.junit.BeforeClass;
 import org.junit.Test;
-import org.k9m.k9nlp.model.DocumentProfile;
-import org.k9m.k9nlp.model.Entity;
-import org.k9m.k9nlp.model.Keyword;
+import org.k9m.k9nlp.model.document.DocumentProfile;
+import org.k9m.k9nlp.model.document.sentence.Sentence;
+import org.k9m.k9nlp.model.document.sentence.entity.Entity;
+import org.k9m.k9nlp.model.document.sentence.entity.Keyword;
 import org.k9m.k9nlp.util.TokenUtils;
 
 import edu.stanford.nlp.pipeline.Annotation;
@@ -21,6 +22,8 @@ public class DocumentProcessorTest {
 	private static final String[] TEST_KEYWORDS = {"die","contain","director","beast","platoon","carnage","lead","alien","superslick","classic","min","action","extravaganza","hard","hd","unseen","violence"};
 	
 	private static Annotation document;
+	private static String documentId;
+	private static DocumentProfile documentProfile;
 
 	@BeforeClass
     public static void onceExecutedBeforeAll() {
@@ -31,35 +34,49 @@ public class DocumentProcessorTest {
 		final DocumentProcessorFactory documentProcessorFactory = DocumentProcessorFactory.getInstance();
 		
 		document = documentProcessorFactory.constructDocument(textBody);
+		
+		documentId = "test_id";
+		documentProfile = new DocumentProcessor(documentId, document).processDocument();
     }
 	
 	@Test
-	public void testDocumentProcessing(){
-		final String documentId = "test_id";
-		
-		DocumentProcessor documentProcessor = new DocumentProcessor(documentId, document);
-		DocumentProfile documentProfile = documentProcessor.processDocument();
-		
+	public void testDocumentProperties(){
 		assertEquals("Document id doesn't match", documentId, documentProfile.getDocumentId());
-		
-		Set<Entity> entities = documentProfile.getEntities();
-		for (Entity entity : entities) {
-			final String entityValue = entity.getEntity();
-			boolean isInEntities = Arrays.binarySearch(TEST_ENTITIES, entityValue) > -1;			
-			assertTrue("Not in entities: " + entityValue, isInEntities);					
-		}
-		assertEquals("Entity mismatch", TEST_ENTITIES.length, entities.size());
-		
-		Set<Keyword> keywords = documentProfile.getKeywords();
-		for (Keyword entity : keywords) {
-			final String entityValue = entity.getLemma();
-			boolean isInEntities = Arrays.binarySearch(TEST_KEYWORDS, entityValue) > -1;			
-			assertTrue("Not in entities: " + entityValue, isInEntities);					
-		}
-		assertEquals("Keyword mismatch", TEST_KEYWORDS.length, keywords.size());
 	}
 	
-	//TODO implementing setting types at runtime
+	
+	@Test
+	public void testEntities(){
+		int totalEntities = 0;
+		for(Sentence sentence : documentProfile.getSentences()){
+			Set<Entity> entities = sentence.getEntities();
+			for (Entity entity : entities) {
+				final String entityValue = entity.getEntity();
+				boolean isInEntities = Arrays.binarySearch(TEST_ENTITIES, entityValue) > -1;			
+				assertTrue("Not in entities: " + entityValue, isInEntities);					
+			}
+			totalEntities += entities.size();		
+		}
+		assertEquals("Entity mismatch", TEST_ENTITIES.length, totalEntities);
+	}
+	
+	
+	@Test
+	public void testKeywords(){		
+		int totalKeywords = 0;
+		for(Sentence sentence : documentProfile.getSentences()){		
+			Set<Keyword> keywords = sentence.getKeywords();
+			for (Keyword entity : keywords) {
+				final String entityValue = entity.getLemma();
+				boolean isInEntities = Arrays.binarySearch(TEST_KEYWORDS, entityValue) > -1;			
+				assertTrue("Not in entities: " + entityValue, isInEntities);					
+			}
+			totalKeywords += keywords.size();		
+		}
+		assertEquals("Entity mismatch", TEST_KEYWORDS.length, totalKeywords);
+	}
+	
+//  TODO implementing setting types at runtime
 //	@Test
 //	public void testSetkeywordType(){
 //		

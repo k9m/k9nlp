@@ -1,18 +1,33 @@
 package org.k9m.k9nlp.stanford;
 
-import static org.k9m.k9nlp.model.KeywordType.*;
+import static org.k9m.k9nlp.model.document.sentence.entity.KeywordType.FW;
+import static org.k9m.k9nlp.model.document.sentence.entity.KeywordType.JJ;
+import static org.k9m.k9nlp.model.document.sentence.entity.KeywordType.JJR;
+import static org.k9m.k9nlp.model.document.sentence.entity.KeywordType.JJS;
+import static org.k9m.k9nlp.model.document.sentence.entity.KeywordType.NN;
+import static org.k9m.k9nlp.model.document.sentence.entity.KeywordType.NNS;
+import static org.k9m.k9nlp.model.document.sentence.entity.KeywordType.UH;
+import static org.k9m.k9nlp.model.document.sentence.entity.KeywordType.VB;
+import static org.k9m.k9nlp.model.document.sentence.entity.KeywordType.VBD;
+import static org.k9m.k9nlp.model.document.sentence.entity.KeywordType.VBG;
+import static org.k9m.k9nlp.model.document.sentence.entity.KeywordType.VBN;
+import static org.k9m.k9nlp.model.document.sentence.entity.KeywordType.VBP;
+import static org.k9m.k9nlp.model.document.sentence.entity.KeywordType.VBZ;
 
 import java.util.Arrays;
 import java.util.List;
 
-import org.k9m.k9nlp.model.DocumentProfile;
-import org.k9m.k9nlp.model.Entity;
-import org.k9m.k9nlp.model.Keyword;
-import org.k9m.k9nlp.model.KeywordType;
+import org.k9m.k9nlp.model.document.DocumentProfile;
+import org.k9m.k9nlp.model.document.sentence.Sentence;
+import org.k9m.k9nlp.model.document.sentence.entity.Entity;
+import org.k9m.k9nlp.model.document.sentence.entity.Keyword;
+import org.k9m.k9nlp.model.document.sentence.entity.KeywordType;
 import org.k9m.k9nlp.util.TokenUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import edu.stanford.nlp.ling.CoreAnnotations.CharacterOffsetBeginAnnotation;
+import edu.stanford.nlp.ling.CoreAnnotations.CharacterOffsetEndAnnotation;
 import edu.stanford.nlp.ling.CoreAnnotations.MentionsAnnotation;
 import edu.stanford.nlp.ling.CoreAnnotations.NamedEntityTagAnnotation;
 import edu.stanford.nlp.ling.CoreAnnotations.OriginalTextAnnotation;
@@ -50,26 +65,33 @@ public class DocumentProcessor {
 //	}
 
 	public DocumentProfile processDocument(){		
-		List<CoreMap> sentences = document.get(SentencesAnnotation.class);
+		List<CoreMap> stanfordSentences = document.get(SentencesAnnotation.class);
 
-		if(sentences.size() > 0){ LOG.debug("SentenceKeys: {}\n", TokenUtils.printKeys(sentences.get(0))); }		
+		if(stanfordSentences.size() > 0){ LOG.debug("SentenceKeys: {}\n", TokenUtils.printKeys(stanfordSentences.get(0))); }		
 		int index = 0;
-		for(CoreMap sentence : sentences) {
-			List<CoreMap> mentions = sentence.get(MentionsAnnotation.class);			
+		for(CoreMap stanfordSentence : stanfordSentences) {			
+			final List<CoreMap> mentions = stanfordSentence.get(MentionsAnnotation.class);
 			
 			if(index++ == 0){
-				if(sentence != null && sentence.size() > 0){ LOG.debug("TokenKeys: {}\n", TokenUtils.printKeys(sentence)); }
+				if(stanfordSentence != null && stanfordSentence.size() > 0){ LOG.debug("TokenKeys: {}\n", TokenUtils.printKeys(stanfordSentence)); }
 				if(mentions != null && mentions.size() > 0){ LOG.debug("MentionsKeys: {}\n", TokenUtils.printKeys(mentions.get(0))); }
 			}
 			
-			LOG.debug("Sentence:  {}", sentence.get(TextAnnotation.class));
+			final String sentenceText = stanfordSentence.get(TextAnnotation.class);
+			final Integer sentenceStartOffset = stanfordSentence.get(CharacterOffsetBeginAnnotation.class);
+			final Integer sentenceEndOffset = stanfordSentence.get(CharacterOffsetEndAnnotation.class);
+			LOG.debug("Sentence[{},{}]:  {}", new Object[]{sentenceStartOffset, sentenceEndOffset, sentenceText});
+			
+			Sentence sentence = new Sentence(sentenceText, sentenceStartOffset, sentenceEndOffset);
 			if(mentions != null && mentions.size() > 0){
-				this.processMentions(mentions);
+				sentence = this.processMentions(mentions, sentence);
 			}
 			
-			if(sentence != null && sentence.size() > 0){
-				this.processSentence(sentence);
+			if(stanfordSentence != null && stanfordSentence.size() > 0){
+				sentence = this.processSentence(stanfordSentence, sentence);
 			}
+			
+			documentProfile.addSentence(sentence);
 
 			// this is the parse tree of the current sentence
 			//Tree tree = sentence.get(TreeAnnotation.class);
@@ -89,8 +111,8 @@ public class DocumentProcessor {
 		return documentProfile;
 	}
 
-	private void processSentence(CoreMap sentence){
-		for (CoreLabel token : sentence.get(TokensAnnotation.class)) {
+	private Sentence processSentence(CoreMap stanfordSentence, Sentence sentence){
+		for (CoreLabel token : stanfordSentence.get(TokensAnnotation.class)) {
 
 			String word = token.get(OriginalTextAnnotation.class);			
 			String pos = token.get(PartOfSpeechAnnotation.class);
@@ -113,13 +135,15 @@ public class DocumentProcessor {
 
 				LOG.debug("===========================\n");
 				
-				documentProfile.addKeyword(keyword);
+				sentence.addKeyword(keyword);				
 			}
 		
 		}
+		
+		return sentence;
 	}
 
-	private void processMentions(List<CoreMap> mentions){		
+	private Sentence processMentions(List<CoreMap> mentions, Sentence sentence){		
 		for (CoreMap mention : mentions) {			
 			String entity = mention.get(TextAnnotation.class);
 			String ne = mention.get(NamedEntityTagAnnotation.class);
@@ -128,8 +152,10 @@ public class DocumentProcessor {
 			LOG.debug("NE:     {}",ne);		
 			LOG.debug("----------------------------");
 			
-			documentProfile.addEntity(new Entity(entity, ne));
+			sentence.addEntity(new Entity(entity, ne));
 		}
+		
+		return sentence;
 	}
 	
 }

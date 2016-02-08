@@ -2,7 +2,7 @@ package org.k9m.k9nlp.main;
 
 import java.io.FileNotFoundException;
 
-import org.k9m.k9nlp.model.DocumentProfile;
+import org.k9m.k9nlp.model.document.DocumentProfile;
 import org.k9m.k9nlp.stanford.DocumentProcessor;
 import org.k9m.k9nlp.stanford.DocumentProcessorFactory;
 import org.k9m.k9nlp.util.TokenUtils;

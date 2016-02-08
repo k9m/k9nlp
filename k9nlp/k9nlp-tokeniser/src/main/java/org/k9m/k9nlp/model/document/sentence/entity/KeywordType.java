@@ -1,4 +1,4 @@
-package org.k9m.k9nlp.model;
+package org.k9m.k9nlp.model.document.sentence.entity;
 
 public enum KeywordType {
 	
