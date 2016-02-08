@@ -78,11 +78,11 @@ public class DocumentProcessor {
 			}
 			
 			final String sentenceText = stanfordSentence.get(TextAnnotation.class);
-			final Integer sentenceStartOffset = stanfordSentence.get(CharacterOffsetBeginAnnotation.class);
+			final Integer offsetStart = stanfordSentence.get(CharacterOffsetBeginAnnotation.class);
 			final Integer sentenceEndOffset = stanfordSentence.get(CharacterOffsetEndAnnotation.class);
-			LOG.debug("Sentence[{},{}]:  {}", new Object[]{sentenceStartOffset, sentenceEndOffset, sentenceText});
+			LOG.debug("Sentence[{},{}]:  {}", new Object[]{offsetStart, sentenceEndOffset, sentenceText});
 			
-			Sentence sentence = new Sentence(sentenceText, sentenceStartOffset, sentenceEndOffset);
+			Sentence sentence = new Sentence(sentenceText, offsetStart, sentenceEndOffset);
 			if(mentions != null && mentions.size() > 0){
 				sentence = this.processMentions(mentions, sentence);
 			}
@@ -114,24 +114,28 @@ public class DocumentProcessor {
 	private Sentence processSentence(CoreMap stanfordSentence, Sentence sentence){
 		for (CoreLabel token : stanfordSentence.get(TokensAnnotation.class)) {
 
-			String word = token.get(OriginalTextAnnotation.class);			
-			String pos = token.get(PartOfSpeechAnnotation.class);
-			String ne = token.get(NamedEntityTagAnnotation.class);			
+			final String word = token.get(OriginalTextAnnotation.class);			
+			final String pos = token.get(PartOfSpeechAnnotation.class);
+			final String ne = token.get(NamedEntityTagAnnotation.class);
+			final String lemma = token.lemma();
+			final Integer offsetStart = token.get(CharacterOffsetBeginAnnotation.class);
+			final Integer offsetEnd = token.get(CharacterOffsetEndAnnotation.class);
 
-			if(TokenUtils.ifAnyOf(parsedKeywordTypes, pos)){				
-				String lemma = token.lemma();
+			if(TokenUtils.ifAnyOf(parsedKeywordTypes, pos)){
 				
-				Keyword keyword = new Keyword();
-				
-				keyword.setKeywordType(ne);
-				keyword.setPos(pos);
-				keyword.setWord(word);
-				keyword.setLemma(lemma);
+				Keyword keyword = new Keyword()
+					.setKeywordType(ne)
+					.setPos(pos)
+					.setWord(word)
+					.setLemma(lemma)
+					.setOffsetStart(offsetStart)
+					.setOffsetEnd(offsetEnd);
 				
 				LOG.debug("Word:   {}",word);
 				LOG.debug("POS:    {}",pos);
 				LOG.debug("NE:     {}",ne);			
 				LOG.debug("Lemma:  {}",lemma);
+				LOG.debug("[{},{}]", new Object[]{offsetStart, offsetEnd});
 
 				LOG.debug("===========================\n");
 				

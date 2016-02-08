@@ -1,29 +1,25 @@
 package org.k9m.k9nlp.model.document.sentence;
 
-import java.util.Collections;
 import java.util.HashSet;
 import java.util.Set;
 
 import org.k9m.k9nlp.model.document.sentence.entity.Entity;
 import org.k9m.k9nlp.model.document.sentence.entity.Keyword;
 
-import edu.stanford.nlp.ling.CoreAnnotations.CharacterOffsetBeginAnnotation;
-import edu.stanford.nlp.ling.CoreAnnotations.CharacterOffsetEndAnnotation;
-
 public class Sentence {
 	
 	private final String sentence;	
-	final Integer sentenceStartOffset;
-	final Integer sentenceEndOffset;
+	final Integer offsetStart;
+	final Integer offsetEnd;
 	
 	private Set<Keyword> keywords;	
 	private Set<Entity> entities;
 	
 	
-	public Sentence(String sentence, Integer sentenceStartOffset, Integer sentenceEndOffset) {
+	public Sentence(String sentence, Integer offsetStart, Integer offsetEnd) {
 		this.sentence = sentence;
-		this.sentenceStartOffset = sentenceStartOffset;
-		this.sentenceEndOffset = sentenceEndOffset;
+		this.offsetStart = offsetStart;
+		this.offsetEnd = offsetEnd;
 		
 		this.keywords = new HashSet<>();
 		this.entities = new HashSet<>();
@@ -34,12 +30,12 @@ public class Sentence {
 		return sentence;
 	}
 	
-	public Integer getSentenceStartOffset() {
-		return sentenceStartOffset;
+	public Integer getOffsetStart() {
+		return offsetStart;
 	}
 	
-	public Integer getSentenceEndOffset() {
-		return sentenceEndOffset;
+	public Integer getOffsetEnd() {
+		return offsetEnd;
 	}
 	
 	public Set<Keyword> getKeywords() {

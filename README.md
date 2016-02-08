@@ -18,62 +18,82 @@ Friendly Java API for extracting Named Entities from a body of text using Stanfo
 	Sample JSON output:
 	
 	{
-		"documentId": "test_id"
-		"sentences": [{
+		"documentId": "test_id",
+		"sentences": [{			
 			"sentence": "Arnold Schwarzenegger and Jerome L'Burgouis leads Mara's platoon of Vikings into New York City carnage against an unseen alien beast along with John Woo's superslick action extravaganza.",
+			"offsetStart": 0,
+			"offsetEnd": 186,
 			"keywords": [{
 				"word": "carnage",
 				"lemma": "carnage",
 				"keywordType": "O",
-				"pos": "NN"
+				"pos": "NN",
+				"offsetStart": 95,
+				"offsetEnd": 102
 			},
 			{
 				"word": "beast",
 				"lemma": "beast",
 				"keywordType": "O",
-				"pos": "NN"
+				"pos": "NN",
+				"offsetStart": 127,
+				"offsetEnd": 132
 			},
 			{
 				"word": "extravaganza",
 				"lemma": "extravaganza",
 				"keywordType": "O",
-				"pos": "NN"
+				"pos": "NN",
+				"offsetStart": 173,
+				"offsetEnd": 185
 			},
 			{
 				"word": "superslick",
 				"lemma": "superslick",
 				"keywordType": "O",
-				"pos": "NN"
+				"pos": "NN",
+				"offsetStart": 155,
+				"offsetEnd": 165
 			},
 			{
 				"word": "leads",
 				"lemma": "lead",
 				"keywordType": "O",
-				"pos": "VBZ"
+				"pos": "VBZ",
+				"offsetStart": 44,
+				"offsetEnd": 49
 			},
 			{
 				"word": "platoon",
 				"lemma": "platoon",
 				"keywordType": "O",
-				"pos": "NN"
+				"pos": "NN",
+				"offsetStart": 57,
+				"offsetEnd": 64
 			},
 			{
 				"word": "action",
 				"lemma": "action",
 				"keywordType": "O",
-				"pos": "NN"
+				"pos": "NN",
+				"offsetStart": 166,
+				"offsetEnd": 172
 			},
 			{
 				"word": "unseen",
 				"lemma": "unseen",
 				"keywordType": "O",
-				"pos": "JJ"
+				"pos": "JJ",
+				"offsetStart": 114,
+				"offsetEnd": 120
 			},
 			{
 				"word": "alien",
 				"lemma": "alien",
 				"keywordType": "O",
-				"pos": "JJ"
+				"pos": "JJ",
+				"offsetStart": 121,
+				"offsetEnd": 126
 			}],
 			"entities": [{
 				"entity": "Jerome L'Burgouis",
