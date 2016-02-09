@@ -1,27 +1,11 @@
 package org.k9m.k9nlp.stanford;
 
-import static org.k9m.k9nlp.model.document.sentence.entity.KeywordType.FW;
-import static org.k9m.k9nlp.model.document.sentence.entity.KeywordType.JJ;
-import static org.k9m.k9nlp.model.document.sentence.entity.KeywordType.JJR;
-import static org.k9m.k9nlp.model.document.sentence.entity.KeywordType.JJS;
-import static org.k9m.k9nlp.model.document.sentence.entity.KeywordType.NN;
-import static org.k9m.k9nlp.model.document.sentence.entity.KeywordType.NNS;
-import static org.k9m.k9nlp.model.document.sentence.entity.KeywordType.UH;
-import static org.k9m.k9nlp.model.document.sentence.entity.KeywordType.VB;
-import static org.k9m.k9nlp.model.document.sentence.entity.KeywordType.VBD;
-import static org.k9m.k9nlp.model.document.sentence.entity.KeywordType.VBG;
-import static org.k9m.k9nlp.model.document.sentence.entity.KeywordType.VBN;
-import static org.k9m.k9nlp.model.document.sentence.entity.KeywordType.VBP;
-import static org.k9m.k9nlp.model.document.sentence.entity.KeywordType.VBZ;
-
-import java.util.Arrays;
 import java.util.List;
 
 import org.k9m.k9nlp.model.document.DocumentProfile;
 import org.k9m.k9nlp.model.document.sentence.Sentence;
-import org.k9m.k9nlp.model.document.sentence.entity.Entity;
-import org.k9m.k9nlp.model.document.sentence.entity.Keyword;
-import org.k9m.k9nlp.model.document.sentence.entity.KeywordType;
+import org.k9m.k9nlp.stanford.element.EntityProcessor;
+import org.k9m.k9nlp.stanford.element.SentenceProcessor;
 import org.k9m.k9nlp.util.TokenUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -29,13 +13,8 @@ import org.slf4j.LoggerFactory;
 import edu.stanford.nlp.ling.CoreAnnotations.CharacterOffsetBeginAnnotation;
 import edu.stanford.nlp.ling.CoreAnnotations.CharacterOffsetEndAnnotation;
 import edu.stanford.nlp.ling.CoreAnnotations.MentionsAnnotation;
-import edu.stanford.nlp.ling.CoreAnnotations.NamedEntityTagAnnotation;
-import edu.stanford.nlp.ling.CoreAnnotations.OriginalTextAnnotation;
-import edu.stanford.nlp.ling.CoreAnnotations.PartOfSpeechAnnotation;
 import edu.stanford.nlp.ling.CoreAnnotations.SentencesAnnotation;
 import edu.stanford.nlp.ling.CoreAnnotations.TextAnnotation;
-import edu.stanford.nlp.ling.CoreAnnotations.TokensAnnotation;
-import edu.stanford.nlp.ling.CoreLabel;
 import edu.stanford.nlp.pipeline.Annotation;
 import edu.stanford.nlp.semgraph.SemanticGraph;
 import edu.stanford.nlp.semgraph.SemanticGraphCoreAnnotations.BasicDependenciesAnnotation;
@@ -47,46 +26,33 @@ import edu.stanford.nlp.util.CoreMap;
 public class DocumentProcessor {
 
 	private static Logger LOG = LoggerFactory.getLogger(DocumentProcessor.class);
-
-	private final DocumentProfile documentProfile;
+		
 	private final Annotation document;
 	
-	private List<KeywordType> parsedKeywordTypes = Arrays.asList(new KeywordType[]{FW,JJ,JJR,JJS,NN,NNS,VB,VBD,VBG,VBN,VBP,VBZ,UH});
+	private DocumentProfile documentProfile;	
 
-	public DocumentProcessor(String documentId, Annotation document) {		
-		this.documentProfile = new DocumentProfile(documentId);
+	public DocumentProcessor(String documentId, Annotation document) {
 		this.document = document;
+		
+		documentProfile = new DocumentProfile(documentId);
 	}
 
-	public DocumentProfile processDocument(){		
+	public DocumentProfile processDocument(){				
 		List<CoreMap> stanfordSentences = document.get(SentencesAnnotation.class);
-
-		if(stanfordSentences.size() > 0){ LOG.debug("SentenceKeys: {}\n", TokenUtils.printKeys(stanfordSentences.get(0))); }		
+				
 		int index = 0;
 		for(final CoreMap stanfordSentence : stanfordSentences) {			
 			final List<CoreMap> mentions = stanfordSentence.get(MentionsAnnotation.class);			
 			
 			if(index++ == 0){
+				LOG.debug("SentenceKeys: {}\n", TokenUtils.printKeys(stanfordSentence));
 				if(stanfordSentence != null && stanfordSentence.size() > 0){ LOG.debug("TokenKeys: {}\n", TokenUtils.printKeys(stanfordSentence)); }
 				if(mentions != null && mentions.size() > 0){ LOG.debug("MentionsKeys: {}\n", TokenUtils.printKeys(mentions.get(0))); }
 			}
 			
-			this.processDocumentProfile(stanfordSentence);
+			this.processSentence(stanfordSentence);
 			
-			final SemanticGraph semanticGraph = stanfordSentence.get(BasicDependenciesAnnotation.class);
-			this.processSemanticGraph(semanticGraph);
-			
-			final Tree tree = stanfordSentence.get(TreeAnnotation.class);
-			this.processParseTree(tree);			
-			
-
-			// this is the parse tree of the current sentence
-			//Tree tree = sentence.get(TreeAnnotation.class);
-
-			// this is the Stanford dependency graph of the current sentence
-			//SemanticGraph dependencies = sentence.get(CollapsedCCProcessedDependenciesAnnotation.class);
-
-			//IndexedWord ind = dependencies.getFirstRoot();
+			printGraphs(stanfordSentence);
 		}
 		
 		// This is the coreference link graph
@@ -96,22 +62,10 @@ public class DocumentProcessor {
 		//Map<Integer, CorefChain> graph = document.get(CorefChainAnnotation.class);
 
 		return documentProfile;
-	}		
-	
-	private void processSemanticGraph(final SemanticGraph semanticGraph){
-		if(semanticGraph != null){
-			semanticGraph.prettyPrint();
-		}				
 	}
 	
-	private void processParseTree(final Tree tree){
-		if(tree != null){
-			tree.pennPrint();		
-		}
-	}
-	
-	private void processDocumentProfile(CoreMap stanfordSentence){
-		final List<CoreMap> mentions = stanfordSentence.get(MentionsAnnotation.class);
+	private void processSentence(CoreMap stanfordSentence){
+		final List<CoreMap> entities = stanfordSentence.get(MentionsAnnotation.class);
 		if(stanfordSentence != null){
 			
 			final String sentenceText = stanfordSentence.get(TextAnnotation.class);
@@ -121,65 +75,29 @@ public class DocumentProcessor {
 			
 			LOG.debug("Sentence[{},{}]:  {}", new Object[]{offsetStart, sentenceEndOffset, sentenceText});
 						
-			if(mentions != null && mentions.size() > 0){
-				this.processMentions(mentions, sentence);
+			if(entities != null && entities.size() > 0){				
+				new EntityProcessor().process(sentence, entities.toArray(new CoreMap[entities.size()]));
 			}
 			
 			if(stanfordSentence != null && stanfordSentence.size() > 0){
-				this.processSentence(stanfordSentence, sentence);
+				new SentenceProcessor().process(stanfordSentence, sentence);
 			}
 			
 			documentProfile.addSentence(sentence);
 		}
 	}
-
-	private void processSentence(CoreMap stanfordSentence, Sentence sentence){
-		for (CoreLabel token : stanfordSentence.get(TokensAnnotation.class)) {
-
-			final String word = token.get(OriginalTextAnnotation.class);			
-			final String pos = token.get(PartOfSpeechAnnotation.class);
-			final String ne = token.get(NamedEntityTagAnnotation.class);
-			final String lemma = token.lemma();
-			final Integer offsetStart = token.get(CharacterOffsetBeginAnnotation.class);
-			final Integer offsetEnd = token.get(CharacterOffsetEndAnnotation.class);
-
-			if(TokenUtils.ifAnyOf(parsedKeywordTypes, pos)){
-				
-				Keyword keyword = new Keyword()
-					.setKeywordType(ne)
-					.setPos(pos)
-					.setWord(word)
-					.setLemma(lemma)
-					.setOffsetStart(offsetStart)
-					.setOffsetEnd(offsetEnd);
-				
-				LOG.debug("Word:   {}",word);
-				LOG.debug("POS:    {}",pos);
-				LOG.debug("NE:     {}",ne);			
-				LOG.debug("Lemma:  {}",lemma);
-				LOG.debug("[{},{}]", new Object[]{offsetStart, offsetEnd});
-
-				LOG.debug("===========================\n");
-				
-				sentence.addKeyword(keyword);				
-			}
-		
-		}		
-		
-	}
-
-	private void processMentions(List<CoreMap> mentions, Sentence sentence){		
-		for (CoreMap mention : mentions) {
-			
-			String entity = mention.get(TextAnnotation.class);
-			String ne = mention.get(NamedEntityTagAnnotation.class);
-
-			LOG.debug("Entity: {}",entity);			
-			LOG.debug("NE:     {}",ne);		
-			LOG.debug("----------------------------");
-			
-			sentence.addEntity(new Entity(entity, ne));
+	
+	private static void printGraphs(CoreMap stanfordSentence){
+		final SemanticGraph semanticGraph = stanfordSentence.get(BasicDependenciesAnnotation.class);
+		if(semanticGraph != null){
+			semanticGraph.prettyPrint();
 		}
+		final Tree tree = stanfordSentence.get(TreeAnnotation.class);
+		if(tree != null){
+			tree.pennPrint();		
+		}
+		
+		
 	}
 	
 }

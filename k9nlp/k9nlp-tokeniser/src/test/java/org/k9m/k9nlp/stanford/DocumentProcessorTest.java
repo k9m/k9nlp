@@ -2,6 +2,19 @@ package org.k9m.k9nlp.stanford;
 
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertTrue;
+import static org.k9m.k9nlp.model.document.sentence.entity.KeywordType.FW;
+import static org.k9m.k9nlp.model.document.sentence.entity.KeywordType.JJ;
+import static org.k9m.k9nlp.model.document.sentence.entity.KeywordType.JJR;
+import static org.k9m.k9nlp.model.document.sentence.entity.KeywordType.JJS;
+import static org.k9m.k9nlp.model.document.sentence.entity.KeywordType.NN;
+import static org.k9m.k9nlp.model.document.sentence.entity.KeywordType.NNS;
+import static org.k9m.k9nlp.model.document.sentence.entity.KeywordType.UH;
+import static org.k9m.k9nlp.model.document.sentence.entity.KeywordType.VB;
+import static org.k9m.k9nlp.model.document.sentence.entity.KeywordType.VBD;
+import static org.k9m.k9nlp.model.document.sentence.entity.KeywordType.VBG;
+import static org.k9m.k9nlp.model.document.sentence.entity.KeywordType.VBN;
+import static org.k9m.k9nlp.model.document.sentence.entity.KeywordType.VBP;
+import static org.k9m.k9nlp.model.document.sentence.entity.KeywordType.VBZ;
 
 import java.util.Arrays;
 import java.util.List;
@@ -12,6 +25,7 @@ import org.k9m.k9nlp.model.document.DocumentProfile;
 import org.k9m.k9nlp.model.document.sentence.Sentence;
 import org.k9m.k9nlp.model.document.sentence.entity.Entity;
 import org.k9m.k9nlp.model.document.sentence.entity.Keyword;
+import org.k9m.k9nlp.model.document.sentence.entity.KeywordType;
 import org.k9m.k9nlp.util.TokenUtils;
 
 import edu.stanford.nlp.pipeline.Annotation;
@@ -19,7 +33,8 @@ import edu.stanford.nlp.pipeline.Annotation;
 public class DocumentProcessorTest {
 	
 	private static final String[] TEST_ENTITIES = {"Arnold Schwarzenegger","Vikings","New York City","1987","John Woo","102 mins","Jerome L'Burgouis","Mara","80s"}; 
-	private static final String[] TEST_KEYWORDS = {"die","contain","director","beast","platoon","carnage","lead","alien","superslick","classic","min","action","extravaganza","hard","hd","unseen","violence"};
+	private static final String[] TEST_KEYWORDS = {"die","contain","director","beast","platoon","carnage","lead","alien","superslick","classic","min","action","extravaganza","hard","hd","unseen","violence"};	
+	private static final List<KeywordType> parsedKeywordTypes = Arrays.asList(new KeywordType[]{FW,JJ,JJR,JJS,NN,NNS,VB,VBD,VBG,VBN,VBP,VBZ,UH});
 	
 	private static Annotation document;
 	private static String documentId;
